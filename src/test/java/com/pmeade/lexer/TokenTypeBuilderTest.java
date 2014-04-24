@@ -205,12 +205,92 @@ public class TokenTypeBuilderTest
     }
 
     @Test
+    public void testLiterate() {
+        String patternWithComments = "lda | # load accumulator\n"
+                                   + "ldx | # load x register\n"
+                                   + "ldy   # load y register\n";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(patternWithComments)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("lda").matches());
+        assertFalse(pattern.matcher("ldx").matches());
+        assertFalse(pattern.matcher("ldy").matches());
+
+        TokenType literateType = new TokenTypeBuilder()
+                  .pattern(patternWithComments)
+                  .literate()
+                  .create();
+        assertNotNull(literateType);
+        Pattern literatePattern = literateType.getPattern();
+        assertNotNull(literatePattern);
+        assertTrue(literatePattern.matcher("lda").matches());
+        assertTrue(literatePattern.matcher("ldx").matches());
+        assertTrue(literatePattern.matcher("ldy").matches());
+    }
+
+    @Test
+    public void testLiterateBoolean() {
+        String patternWithComments = "lda | # load accumulator\n"
+                                   + "ldx | # load x register\n"
+                                   + "ldy   # load y register\n";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(patternWithComments)
+                  .literate(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("lda").matches());
+        assertFalse(pattern.matcher("ldx").matches());
+        assertFalse(pattern.matcher("ldy").matches());
+
+        TokenType literateType = new TokenTypeBuilder()
+                  .pattern(patternWithComments)
+                  .literate(true)
+                  .create();
+        assertNotNull(literateType);
+        Pattern literatePattern = literateType.getPattern();
+        assertNotNull(literatePattern);
+        assertTrue(literatePattern.matcher("lda").matches());
+        assertTrue(literatePattern.matcher("ldx").matches());
+        assertTrue(literatePattern.matcher("ldy").matches());
+    }
+
+    @Test
+    public void testFlagLiterate() {
+        String patternWithComments = "lda | # load accumulator\n"
+                                   + "ldx | # load x register\n"
+                                   + "ldy   # load y register\n";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(patternWithComments)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("lda").matches());
+        assertFalse(pattern.matcher("ldx").matches());
+        assertFalse(pattern.matcher("ldy").matches());
+
+        TokenType literateType = new TokenTypeBuilder()
+                  .pattern(patternWithComments)
+                  .flag(Pattern.COMMENTS)
+                  .create();
+        assertNotNull(literateType);
+        Pattern literatePattern = literateType.getPattern();
+        assertNotNull(literatePattern);
+        assertTrue(literatePattern.matcher("lda").matches());
+        assertTrue(literatePattern.matcher("ldx").matches());
+        assertTrue(literatePattern.matcher("ldy").matches());
+    }
+    
+    @Test
     public void testResumeHere() {
         assertTrue(false);
     }
 /*
-static int 	COMMENTS
-          Permits whitespace and comments in pattern.
 static int 	DOTALL
           Enables dotall mode.
 static int 	LITERAL

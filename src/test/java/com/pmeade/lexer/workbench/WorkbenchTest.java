@@ -75,9 +75,7 @@ public class WorkbenchTest
     /**
      * Detection of partial matches allows us to determine if the matcher
      * completely failed to match, or might have matched, given a little
-     * more input. This feature turns out to be pretty important when
-     * you want to know if a matcher is still in the race to create a
-     * maximum-munch token from some input.
+     * more input.
      */
     @Test
     public void testMatcherPartialMatch() {
@@ -111,5 +109,64 @@ public class WorkbenchTest
         } catch(NullPointerException e) {
             // expected
         }
+    }
+    
+    /**
+     * Some tests to clarify the behavior of find().
+     */
+    @Test
+    public void testMatcherFind() {
+        Pattern joe = Pattern.compile("Joe");
+        Pattern joeBob = Pattern.compile("JoeBob");
+        Pattern marySue = Pattern.compile("MarySue");
+        
+        String input = "JoeBobMarySue";
+        
+        Matcher matcherJoe = joe.matcher(input);
+        Matcher matcherJoeBob = joeBob.matcher(input);
+        Matcher matcherMarySue = marySue.matcher(input);
+        
+        assertTrue(matcherJoe.find(0));
+        assertTrue(matcherJoeBob.find(0));
+        assertTrue(matcherMarySue.find(0));
+
+        assertEquals(3, matcherJoe.end() - matcherJoe.start());
+        assertEquals(6, matcherJoeBob.end() - matcherJoeBob.start());
+        assertEquals(7, matcherMarySue.end() - matcherMarySue.start());
+
+        assertEquals(0, matcherJoe.start());
+        assertEquals(0, matcherJoeBob.start());
+        assertEquals(6, matcherMarySue.start());
+    }
+    
+    /**
+     * Some tests to clarify the behavior of lookingAt().
+     */
+    @Test
+    public void testMatcherLookingAt() {
+        Pattern joe = Pattern.compile("Joe");
+        Pattern joeBob = Pattern.compile("JoeBob");
+        Pattern marySue = Pattern.compile("MarySue");
+        
+        String input = "JoeBobMarySue";
+        
+        Matcher matcherJoe = joe.matcher(input);
+        Matcher matcherJoeBob = joeBob.matcher(input);
+        Matcher matcherMarySue = marySue.matcher(input);
+        
+        assertTrue(matcherJoe.lookingAt());
+        assertTrue(matcherJoeBob.lookingAt());
+        assertFalse(matcherMarySue.lookingAt());
+
+        assertEquals(0, matcherJoe.start());
+        assertEquals(0, matcherJoeBob.start());
+        assertEquals(3, matcherJoe.end() - matcherJoe.start());
+        assertEquals(6, matcherJoeBob.end() - matcherJoeBob.start());
+
+        CharSequence seq = input.subSequence(6, input.length());
+        matcherMarySue = marySue.matcher(seq);
+        assertTrue(matcherMarySue.lookingAt());
+        assertEquals(0, matcherMarySue.start());
+        assertEquals(7, matcherMarySue.end() - matcherMarySue.start());
     }
 }

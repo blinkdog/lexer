@@ -72,6 +72,24 @@ public class TokenTypeBuilder
         }
         return this;
     }
+
+    // TODO: javadoc
+    public TokenTypeBuilder literate()
+    {
+        flags |= Pattern.COMMENTS;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder literate(boolean apply)
+    {
+        if(apply) {
+            flags |= Pattern.COMMENTS;
+        } else {
+            flags &= ~(Pattern.COMMENTS);
+        }
+        return this;
+    }
     
     // TODO: javadoc
     public TokenTypeBuilder pattern(String pattern)
