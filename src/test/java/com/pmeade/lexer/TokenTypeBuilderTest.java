@@ -285,21 +285,271 @@ public class TokenTypeBuilderTest
         assertTrue(literatePattern.matcher("ldx").matches());
         assertTrue(literatePattern.matcher("ldy").matches());
     }
+  
+    @Test
+    public void testDotAll() {
+        String regex = "a.b";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("a\nb").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .dotAll()
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("a\nb").matches());
+    }
+
+    @Test
+    public void testDotAllBoolean() {
+        String regex = "a.b";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .dotAll(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("a\nb").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .dotAll(true)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("a\nb").matches());
+    }
+
+    @Test
+    public void testDotAllFlag() {
+        String regex = "a.b";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("a\nb").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .flag(Pattern.DOTALL)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("a\nb").matches());
+    }
+
+    @Test
+    public void testLiteral() {
+        String regex = "[0-9]+";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("[0-9]+").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .literal()
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("[0-9]+").matches());
+    }
+
+    @Test
+    public void testLiteralBoolean() {
+        String regex = "[0-9]+";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .literal(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("[0-9]+").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .literal(true)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("[0-9]+").matches());
+    }
+    
+    @Test
+    public void testLiteralFlag() {
+        String regex = "[0-9]+";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("[0-9]+").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .flag(Pattern.LITERAL)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("[0-9]+").matches());
+    }
+
+    @Test
+    public void testMultiLine() {
+        String regex = "^dog$";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("cat\ndog\nmouse").find());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .multiLine()
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("cat\ndog\nmouse").find());
+    }
+
+    @Test
+    public void testMultiLineBoolean() {
+        String regex = "^dog$";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .multiLine(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("cat\ndog\nmouse").find());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .multiLine(true)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("cat\ndog\nmouse").find());
+    }
+
+    @Test
+    public void testFlagMultiLine() {
+        String regex = "^dog$";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("cat\ndog\nmouse").find());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .flag(Pattern.MULTILINE)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("cat\ndog\nmouse").find());
+    }
+
+    @Test
+    public void testUnicode() {
+        String regex = "résumé";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .ignoreCase()
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("RÉSUMÉ").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .ignoreCase()
+                  .unicode()
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("RÉSUMÉ").matches());
+    }
+
+    @Test
+    public void testUnicodeBoolean() {
+        String regex = "résumé";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .ignoreCase()
+                  .unicode(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("RÉSUMÉ").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .ignoreCase()
+                  .unicode(true)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("RÉSUMÉ").matches());
+    }
+
+    @Test
+    public void testFlagUnicode() {
+        String regex = "résumé";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .ignoreCase()
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertFalse(pattern.matcher("RÉSUMÉ").matches());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern(regex)
+                  .ignoreCase()
+                  .flag(Pattern.UNICODE_CASE)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("RÉSUMÉ").matches());
+    }
     
     @Test
     public void testResumeHere() {
         assertTrue(false);
     }
-/*
-static int 	DOTALL
-          Enables dotall mode.
-static int 	LITERAL
-          Enables literal parsing of the pattern.
-static int 	MULTILINE
-          Enables multiline mode.
-static int 	UNICODE_CASE
-          Enables Unicode-aware case folding.
-static int 	UNIX_LINES
-          Enables Unix lines mode.    
-*/
 }

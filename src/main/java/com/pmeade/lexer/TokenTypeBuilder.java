@@ -49,6 +49,24 @@ public class TokenTypeBuilder
     }
 
     // TODO: javadoc
+    public TokenTypeBuilder dotAll()
+    {
+        flags |= Pattern.DOTALL;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder dotAll(boolean apply)
+    {
+        if(apply) {
+            flags |= Pattern.DOTALL;
+        } else {
+            flags &= ~(Pattern.DOTALL);
+        }
+        return this;
+    }
+    
+    // TODO: javadoc
     public TokenTypeBuilder flag(int flag)
     {
         flags |= flag;
@@ -74,6 +92,24 @@ public class TokenTypeBuilder
     }
 
     // TODO: javadoc
+    public TokenTypeBuilder literal()
+    {
+        flags |= Pattern.LITERAL;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder literal(boolean apply)
+    {
+        if(apply) {
+            flags |= Pattern.LITERAL;
+        } else {
+            flags &= ~(Pattern.LITERAL);
+        }
+        return this;
+    }
+    
+    // TODO: javadoc
     public TokenTypeBuilder literate()
     {
         flags |= Pattern.COMMENTS;
@@ -90,11 +126,65 @@ public class TokenTypeBuilder
         }
         return this;
     }
+
+    // TODO: javadoc
+    public TokenTypeBuilder multiLine()
+    {
+        flags |= Pattern.MULTILINE;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder multiLine(boolean apply)
+    {
+        if(apply) {
+            flags |= Pattern.MULTILINE;
+        } else {
+            flags &= ~(Pattern.MULTILINE);
+        }
+        return this;
+    }
     
     // TODO: javadoc
     public TokenTypeBuilder pattern(String pattern)
     {
         this.pattern = pattern;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder unicode()
+    {
+        flags |= Pattern.UNICODE_CASE;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder unicode(boolean apply)
+    {
+        if(apply) {
+            flags |= Pattern.UNICODE_CASE;
+        } else {
+            flags &= ~(Pattern.UNICODE_CASE);
+        }
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder unix()
+    {
+        flags |= Pattern.UNIX_LINES;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder unix(boolean apply)
+    {
+        if(apply) {
+            flags |= Pattern.UNIX_LINES;
+        } else {
+            flags &= ~(Pattern.UNIX_LINES);
+        }
         return this;
     }
     
