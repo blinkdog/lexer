@@ -24,7 +24,13 @@ import java.util.Objects;
 public class Token
 {
     // TODO: javadoc
-    public Token(int sequence, TokenType tokenType, String tokenText) {
+    public Token(
+            int sequence,
+            TokenType tokenType,
+            String tokenText,
+            int position)
+    {
+        this.position = position;
         this.sequence = sequence;
         this.tokenText = tokenText;
         this.tokenType = tokenType;
@@ -32,10 +38,11 @@ public class Token
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + this.sequence;
-        hash = 97 * hash + Objects.hashCode(this.tokenText);
-        hash = 97 * hash + Objects.hashCode(this.tokenType);
+        int hash = 5;
+        hash = 79 * hash + this.position;
+        hash = 79 * hash + this.sequence;
+        hash = 79 * hash + Objects.hashCode(this.tokenText);
+        hash = 79 * hash + Objects.hashCode(this.tokenType);
         return hash;
     }
 
@@ -48,6 +55,9 @@ public class Token
             return false;
         }
         final Token other = (Token) obj;
+        if (this.position != other.position) {
+            return false;
+        }
         if (this.sequence != other.sequence) {
             return false;
         }
@@ -58,6 +68,11 @@ public class Token
             return false;
         }
         return true;
+    }
+    
+    // TODO: javadoc
+    public int getPosition() {
+        return position;
     }
     
     // TODO: javadoc
@@ -76,8 +91,11 @@ public class Token
     }
 
     // TODO: javadoc
-    private final int sequence;
+    private final int position;
     
+    // TODO: javadoc
+    private final int sequence;
+
     // TODO: javadoc
     private final String tokenText;
     

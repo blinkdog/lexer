@@ -29,28 +29,8 @@ import org.junit.Test;
 
 public class LexerTest
 {
-    private static List<TokenType> asmTokens;
-    private static void setUpAsmTokens() {
-        asmTokens = new ArrayList();
-        asmTokens.add(new TokenTypeBuilder()
-            .name("COMMENT")
-            .pattern(";.*$")
-            .create());
-        asmTokens.add(new TokenTypeBuilder()
-            .name("WHITESPACE")
-            .pattern("\\s+")
-            .create());
-        asmTokens.add(new TokenTypeBuilder()
-            .name("COLON")
-            .pattern(":")
-            .literal()
-            .create());
-        asmTokens.add(new TokenTypeBuilder()
-            .name("HEX_LITERAL")
-            .pattern("\\$[0-9a-f]+")
-            .ignoreCase()
-            .create());
-    }
+    private static final String FLYWEIGHT_GOSUB = "gosub";
+    private static final String FLYWEIGHT_GOTO = "goto";
 
     private static List<TokenType> calcTokens;
     private static void setUpCalcTokens() {
@@ -77,6 +57,43 @@ public class LexerTest
         calcTokens.add(new TokenTypeBuilder()
             .name("WHITESPACE")
             .pattern("\\s+")
+            .skip()
+            .create());
+    }
+
+    private static List<TokenType> ciLangTokens;
+    private static void setUpCILangTokens() {
+        ciLangTokens = new ArrayList();
+        ciLangTokens.add(new TokenTypeBuilder()
+            .name("KEYWORD_GOTO")
+            .pattern("goto")
+            .ignoreCase()
+            .create());
+        ciLangTokens.add(new TokenTypeBuilder()
+            .name("KEYWORD_GOSUB")
+            .pattern("gosub")
+            .ignoreCase()
+            .staticText(FLYWEIGHT_GOSUB)
+            .create());
+        ciLangTokens.add(new TokenTypeBuilder()
+            .name("WHITESPACE")
+            .pattern("\\s+")
+            .skip()
+            .create());
+    }
+    
+    private static List<TokenType> wordTokens;
+    private static void setUpWordTokens() {
+        wordTokens = new ArrayList();
+        wordTokens.add(new TokenTypeBuilder()
+            .name("WORD")
+            .pattern("[a-z]+")
+            .ignoreCase()
+            .create());
+        wordTokens.add(new TokenTypeBuilder()
+            .name("WHITESPACE")
+            .pattern("\\s+")
+            .skip()
             .create());
     }
     
@@ -86,6 +103,8 @@ public class LexerTest
     @BeforeClass
     public static void setUpClass() {
         setUpCalcTokens();
+        setUpCILangTokens();
+        setUpWordTokens();
     }
     
     @AfterClass
@@ -250,5 +269,93 @@ public class LexerTest
         assertEquals("+", tokens.get(2).getTokenText());
         assertEquals("3", tokens.get(3).getTokenText());
         assertEquals(")", tokens.get(4).getTokenText());
+    }
+    
+    @Test
+    public void testScanNoSkip() {
+        Lexer lexer = new Lexer(calcTokens, "( 2 + 3 )\n");
+        List<Token> tokens = lexer.scanNoSkip();
+        assertNotNull(tokens);
+        assertEquals(10, tokens.size());
+        assertEquals("(",  tokens.get(0).getTokenText());
+        assertEquals(" ",  tokens.get(1).getTokenText());
+        assertEquals("2",  tokens.get(2).getTokenText());
+        assertEquals(" ",  tokens.get(3).getTokenText());
+        assertEquals("+",  tokens.get(4).getTokenText());
+        assertEquals(" ",  tokens.get(5).getTokenText());
+        assertEquals("3",  tokens.get(6).getTokenText());
+        assertEquals(" ",  tokens.get(7).getTokenText());
+        assertEquals(")",  tokens.get(8).getTokenText());
+        assertEquals("\n", tokens.get(9).getTokenText());
+    }
+
+    @Test
+    public void testPosition() {
+        Lexer lexer = new Lexer(calcTokens, "( 2 + 3 )\n");
+        List<Token> tokens = lexer.scanNoSkip();
+        assertNotNull(tokens);
+        assertEquals(10, tokens.size());
+        assertEquals(0, tokens.get(0).getPosition());
+        assertEquals(1, tokens.get(1).getPosition());
+        assertEquals(2, tokens.get(2).getPosition());
+        assertEquals(3, tokens.get(3).getPosition());
+        assertEquals(4, tokens.get(4).getPosition());
+        assertEquals(5, tokens.get(5).getPosition());
+        assertEquals(6, tokens.get(6).getPosition());
+        assertEquals(7, tokens.get(7).getPosition());
+        assertEquals(8, tokens.get(8).getPosition());
+        assertEquals(9, tokens.get(9).getPosition());
+    }
+    
+    @Test
+    public void testPosition2() {
+        //                                             1         2
+        //                                   01234567890123456789012
+        Lexer lexer = new Lexer(wordTokens, "public static void main");
+        List<Token> tokens = lexer.scanNoSkip();
+        assertNotNull(tokens);
+        assertEquals(7, tokens.size());
+        assertEquals(0,  tokens.get(0).getPosition());
+        assertEquals(6,  tokens.get(1).getPosition());
+        assertEquals(7,  tokens.get(2).getPosition());
+        assertEquals(13, tokens.get(3).getPosition());
+        assertEquals(14, tokens.get(4).getPosition());
+        assertEquals(18, tokens.get(5).getPosition());
+        assertEquals(19, tokens.get(6).getPosition());
+    }
+    
+    @Test
+    public void testPosition3() {
+        //                                             1         2
+        //                                   01234567890123456789012
+        Lexer lexer = new Lexer(wordTokens, "public static void main");
+        List<Token> tokens = lexer.scan();
+        assertNotNull(tokens);
+        assertEquals(4, tokens.size());
+        assertEquals(0,  tokens.get(0).getPosition());
+        assertEquals(7,  tokens.get(1).getPosition());
+        assertEquals(14, tokens.get(2).getPosition());
+        assertEquals(19, tokens.get(3).getPosition());
+    }
+    
+    @Test
+    public void testStaticText() {
+        //                                               1         2         3         4         5
+        //                                     012345678901234567890123456789012345678901234567890123456789
+        Lexer lexer = new Lexer(ciLangTokens, "goTO GOto GoTo GOTO goSUB GOsub GoSuB gOsUb GOSUB gosub");
+        List<Token> tokens = lexer.scan();
+        assertNotNull(tokens);
+        assertEquals(10, tokens.size());
+        for(int i=0; i<4; i++) {
+            Token token = tokens.get(i);
+            assertTrue("goto".equalsIgnoreCase(token.getTokenText()));
+            assertFalse("goto".equals(token.getTokenText()));
+            assertFalse(FLYWEIGHT_GOTO == token.getTokenText());
+        }
+        for(int i=4; i<10; i++) {
+            Token token = tokens.get(i);
+            assertTrue("gosub".equals(token.getTokenText()));
+            assertTrue(FLYWEIGHT_GOSUB == token.getTokenText());
+        }
     }
 }

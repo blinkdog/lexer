@@ -560,8 +560,147 @@ public class TokenTypeBuilderTest
         assertEquals("INT_LITERAL", name);
     }
     
-//    @Test
-    public void testResumeHere() {
-        assertTrue(false);
+    @Test
+    public void testEmit() {
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern("\\s+")
+                  .emit()
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("   ").matches());
+        assertTrue(pattern.matcher("\t\t\r\n").matches());
+        assertFalse(tokenType.isSkipped());
+    }
+
+    @Test
+    public void testEmitBoolean() {
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern("\\s+")
+                  .emit(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("   ").matches());
+        assertTrue(pattern.matcher("\t\t\r\n").matches());
+        assertTrue(tokenType.isSkipped());
+        
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern("\\s+")
+                  .emit(true)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("   ").matches());
+        assertTrue(pattern2.matcher("\t\t\r\n").matches());
+        assertFalse(tokenType2.isSkipped());
+    }
+
+    @Test
+    public void testSkip() {
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern("\\s+")
+                  .skip()
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("   ").matches());
+        assertTrue(pattern.matcher("\t\t\r\n").matches());
+        assertTrue(tokenType.isSkipped());
+    }
+
+    @Test
+    public void testSkipBoolean() {
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern("\\s+")
+                  .skip(false)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("   ").matches());
+        assertTrue(pattern.matcher("\t\t\r\n").matches());
+        assertFalse(tokenType.isSkipped());
+        
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .pattern("\\s+")
+                  .skip(true)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("   ").matches());
+        assertTrue(pattern2.matcher("\t\t\r\n").matches());
+        assertTrue(tokenType2.isSkipped());
+    }
+
+    @Test
+    public void testStaticText() {
+        String regex = "abstract";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .name("KEYWORD_ABSTRACT")
+                  .pattern(regex)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("abstract").matches());
+        assertNull(tokenType.getStaticText());
+
+        TokenType tokenType2 = new TokenTypeBuilder()
+                  .name("KEYWORD_ABSTRACT")
+                  .pattern(regex)
+                  .staticText(regex)
+                  .create();
+        assertNotNull(tokenType2);
+        Pattern pattern2 = tokenType2.getPattern();
+        assertNotNull(pattern2);
+        assertTrue(pattern2.matcher("abstract").matches());
+        assertNotNull(tokenType2.getStaticText());
+        assertEquals(regex, tokenType2.getStaticText());
+        assertTrue(regex == tokenType2.getStaticText());
+    }
+    
+    @Test
+    public void testLiteralImpliesStaticText() {
+        String regex = "abstract";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .name("KEYWORD_ABSTRACT")
+                  .pattern(regex)
+                  .literal()
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("abstract").matches());
+        assertNotNull(tokenType.getStaticText());
+        assertEquals(regex, tokenType.getStaticText());
+        assertTrue(regex == tokenType.getStaticText());
+    }
+    
+    @Test
+    public void testLiteralDoesNotOverrideStaticText() {
+        String staticText = "AbStRaCt";
+        String regex = "abstract";
+        TokenType tokenType = new TokenTypeBuilder()
+                  .name("KEYWORD_ABSTRACT")
+                  .pattern(regex)
+                  .literal()
+                  .staticText(staticText)
+                  .create();
+        assertNotNull(tokenType);
+        Pattern pattern = tokenType.getPattern();
+        assertNotNull(pattern);
+        assertTrue(pattern.matcher("abstract").matches());
+        assertNotNull(tokenType.getStaticText());
+        assertNotSame(regex, tokenType.getStaticText());
+        assertFalse(regex.equals(tokenType.getStaticText()));
+        assertTrue(regex.equalsIgnoreCase(tokenType.getStaticText()));
+        assertFalse(regex == tokenType.getStaticText());
+        assertTrue(staticText == tokenType.getStaticText());
     }
 }

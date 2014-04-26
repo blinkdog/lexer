@@ -37,12 +37,33 @@ public class Lexer
     {
         this.executorService = Executors.newCachedThreadPool();
         this.input = new LexicalCharSequence(source);
+        this.position = 0;
+        this.sequence = 0;
         this.source = source;
         this.spec = spec;
     }
-    
+
     // TODO: javadoc
     public Token next() {
+        // until we find something we can return to the caller
+        while(true) {
+            // find the next token
+            Token emitToken = nextNoSkip();
+            // if we've reached the end
+            if(emitToken == null) {
+                // return that we've reached the end
+                return null;
+            }
+            // if we've obtained a non-skip token
+            if(emitToken.getTokenType().isSkipped() == false) {
+                // return that
+                return emitToken;
+            }
+        }
+    }
+    
+    // TODO: javadoc
+    public Token nextNoSkip() {
         // check if we've still got input
         if(input.length() == 0) { return null; }
         // build up the scanners
@@ -98,12 +119,18 @@ public class Lexer
         } catch(Exception e) {
             throw new IllegalStateException(e);
         }
-        Token token = new Token(
-                        sequence,
-                        scanResult.getTokenType(),
-                        scanResult.getTokenText());
+        // determine if we use the canonical text from the TokenType
+        TokenType tokenType = scanResult.getTokenType();
+        String tokenText = tokenType.getStaticText();
+        if(tokenText == null) {
+            // nope, we need the actual text that we scanned from the input
+            tokenText = scanResult.getTokenText();
+        }
+        Token token = new Token(sequence, tokenType, tokenText, position);
         // trim the token's text off the front of the input
         input = input.subSequence(scanResult.getTokenText().length(), input.length());
+        // update our position count
+        position += scanResult.getTokenText().length();
         // update our sequence count
         sequence++;
         // return the winning token to the caller
@@ -114,6 +141,7 @@ public class Lexer
     public void reset()
     {
         this.input = new LexicalCharSequence(source);
+        this.position = 0;
         this.sequence = 0;
     }
 
@@ -128,12 +156,27 @@ public class Lexer
         }
         return tokens;
     }
+
+    // TODO: javadoc
+    public List<Token> scanNoSkip()
+    {
+        List<Token> tokens = new ArrayList();
+        while(true) {
+            Token token = nextNoSkip();
+            if(token == null) break;
+            tokens.add(token);
+        }
+        return tokens;
+    }
     
     // TODO: javadoc
     private final ExecutorService executorService;
     
     // TODO: javadoc
     private CharSequence input;
+    
+    // TODO: javadoc
+    private int position;
     
     // TODO: javadoc
     private int sequence;

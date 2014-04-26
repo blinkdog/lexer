@@ -24,9 +24,17 @@ import java.util.regex.Pattern;
 public class TokenType
 {
     // TODO: javadoc
-    public TokenType(String name, String patternRegEx, int patternFlags) {
+    public TokenType(
+            String name,
+            String patternRegEx,
+            int patternFlags,
+            boolean skipped,
+            String staticText)
+    {
         this.name = name;
         this.pattern = Pattern.compile(patternRegEx, patternFlags);
+        this.skipped = skipped;
+        this.staticText = staticText;
     }
 
     // TODO: javadoc
@@ -38,10 +46,26 @@ public class TokenType
     public Pattern getPattern() {
         return pattern;
     }
+
+    // TODO: javadoc
+    public boolean isSkipped() {
+        return skipped;
+    }
+
+    // TODO: javadoc
+    public String getStaticText() {
+        return staticText;
+    }
     
     // TODO: javadoc
     private final String name;
     
     // TODO: javadoc
     private final Pattern pattern;
+    
+    // TODO: javadoc
+    private final boolean skipped;
+
+    // TODO: javadoc
+    private final String staticText;
 }

@@ -45,7 +45,12 @@ public class TokenTypeBuilder
     // TODO: javadoc
     public TokenType create()
     {
-        return new TokenType(name, pattern, flags);
+        if((flags & Pattern.LITERAL) == Pattern.LITERAL) {
+            if(staticText == null) {
+                staticText = pattern;
+            }
+        }
+        return new TokenType(name, pattern, flags, skipped, staticText);
     }
 
     // TODO: javadoc
@@ -63,6 +68,20 @@ public class TokenTypeBuilder
         } else {
             flags &= ~(Pattern.DOTALL);
         }
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder emit()
+    {
+        skipped = false;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder emit(boolean apply)
+    {
+        skipped = !apply;
         return this;
     }
     
@@ -160,6 +179,27 @@ public class TokenTypeBuilder
     }
 
     // TODO: javadoc
+    public TokenTypeBuilder skip()
+    {
+        skipped = true;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder skip(boolean apply)
+    {
+        skipped = apply;
+        return this;
+    }
+
+    // TODO: javadoc
+    public TokenTypeBuilder staticText(String staticText)
+    {
+        this.staticText = staticText;
+        return this;
+    }
+    
+    // TODO: javadoc
     public TokenTypeBuilder unicode()
     {
         flags |= Pattern.UNICODE_CASE;
@@ -203,4 +243,10 @@ public class TokenTypeBuilder
     
     // TODO: javadoc
     private String pattern;
+    
+    // TODO: javadoc
+    private boolean skipped;
+    
+    // TODO: javadoc
+    private String staticText;
 }

@@ -54,7 +54,7 @@ public class TokenTest
     @Test
     public void testGetTokenType() {
         TokenType lParen = new TokenTypeBuilder().pattern("(").literal().create();
-        Token token = new Token(0, lParen, "(");
+        Token token = new Token(0, lParen, "(", 0);
         TokenType tokenType = token.getTokenType();
         assertEquals(lParen, tokenType);
     }
