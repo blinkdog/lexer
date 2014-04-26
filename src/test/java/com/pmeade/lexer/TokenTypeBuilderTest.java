@@ -547,8 +547,20 @@ public class TokenTypeBuilderTest
         assertNotNull(pattern2);
         assertTrue(pattern2.matcher("RÉSUMÉ").matches());
     }
-    
+
     @Test
+    public void testName() {
+        TokenType tokenType = new TokenTypeBuilder()
+                  .pattern("[1-9][0-9]+")
+                  .name("INT_LITERAL")
+                  .create();
+        assertNotNull(tokenType);
+        String name = tokenType.getName();
+        assertNotNull(name);
+        assertEquals("INT_LITERAL", name);
+    }
+    
+//    @Test
     public void testResumeHere() {
         assertTrue(false);
     }

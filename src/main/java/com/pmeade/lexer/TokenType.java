@@ -24,14 +24,23 @@ import java.util.regex.Pattern;
 public class TokenType
 {
     // TODO: javadoc
-    public TokenType(String patternRegEx, int patternFlags) {
-        pattern = Pattern.compile(patternRegEx, patternFlags);
+    public TokenType(String name, String patternRegEx, int patternFlags) {
+        this.name = name;
+        this.pattern = Pattern.compile(patternRegEx, patternFlags);
     }
 
+    // TODO: javadoc
+    public String getName() {
+        return name;
+    }
+    
     // TODO: javadoc
     public Pattern getPattern() {
         return pattern;
     }
+    
+    // TODO: javadoc
+    private final String name;
     
     // TODO: javadoc
     private final Pattern pattern;

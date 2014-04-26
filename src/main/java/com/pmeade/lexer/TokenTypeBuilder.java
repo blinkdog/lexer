@@ -45,7 +45,7 @@ public class TokenTypeBuilder
     // TODO: javadoc
     public TokenType create()
     {
-        return new TokenType(pattern, flags);
+        return new TokenType(name, pattern, flags);
     }
 
     // TODO: javadoc
@@ -144,6 +144,13 @@ public class TokenTypeBuilder
         }
         return this;
     }
+
+    // TODO: javadoc
+    public TokenTypeBuilder name(String name)
+    {
+        this.name = name;
+        return this;
+    }
     
     // TODO: javadoc
     public TokenTypeBuilder pattern(String pattern)
@@ -170,26 +177,29 @@ public class TokenTypeBuilder
         return this;
     }
 
-    // TODO: javadoc
-    public TokenTypeBuilder unix()
-    {
-        flags |= Pattern.UNIX_LINES;
-        return this;
-    }
-
-    // TODO: javadoc
-    public TokenTypeBuilder unix(boolean apply)
-    {
-        if(apply) {
-            flags |= Pattern.UNIX_LINES;
-        } else {
-            flags &= ~(Pattern.UNIX_LINES);
-        }
-        return this;
-    }
+//    // TODO: javadoc
+//    public TokenTypeBuilder unix()
+//    {
+//        flags |= Pattern.UNIX_LINES;
+//        return this;
+//    }
+//
+//    // TODO: javadoc
+//    public TokenTypeBuilder unix(boolean apply)
+//    {
+//        if(apply) {
+//            flags |= Pattern.UNIX_LINES;
+//        } else {
+//            flags &= ~(Pattern.UNIX_LINES);
+//        }
+//        return this;
+//    }
     
     // TODO: javadoc
     private int flags;
+    
+    // TODO: javadoc
+    private String name;
     
     // TODO: javadoc
     private String pattern;
