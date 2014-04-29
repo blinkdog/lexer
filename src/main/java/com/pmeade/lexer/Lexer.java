@@ -35,6 +35,8 @@ public class Lexer
     // TODO: javadoc
     public Lexer(List<TokenType> spec, CharSequence source)
     {
+        if(spec == null) throw new NullPointerException();
+        this.error = false;
         this.executorService = Executors.newCachedThreadPool();
         this.input = new LexicalCharSequence(source);
         this.position = 0;
@@ -43,6 +45,11 @@ public class Lexer
         this.spec = spec;
     }
 
+    // TODO: javadoc
+    public boolean isError() {
+        return error;
+    }
+    
     // TODO: javadoc
     public Token next() {
         // until we find something we can return to the caller
@@ -65,6 +72,7 @@ public class Lexer
     // TODO: javadoc
     public Token nextNoSkip() {
         // check if we've still got input
+        if(error) { return null; }
         if(input.length() == 0) { return null; }
         // build up the scanners
         List<ScanResult> scanResults = new ArrayList();
@@ -80,6 +88,13 @@ public class Lexer
             } catch(InterruptedException e) {
                 // oops
             }
+        }
+        // if we didn't get any results at all
+        if(results.isEmpty()) {
+            // indicate that lexical analysis failed on the input
+            error = true;
+            // and return end-of-stream
+            return null;
         }
         // sort the results by token priority
         Collections.sort(results, new Comparator<Future<ScanResult>>() {
@@ -111,13 +126,20 @@ public class Lexer
                 }
             }
         });
-        // create a Token to return, based on the winner
+        // obtain the scan result with the longest match and highest priority
         Future<ScanResult> winner = results.get(0);
         ScanResult scanResult;
         try {
             scanResult = winner.get();
         } catch(Exception e) {
             throw new IllegalStateException(e);
+        }
+        // if the winner wasn't even a successful match
+        if(scanResult.isSuccess() == false) {
+            // indicate that lexical analysis failed on the input
+            error = true;
+            // and return end-of-stream
+            return null;
         }
         // determine if we use the canonical text from the TokenType
         TokenType tokenType = scanResult.getTokenType();
@@ -140,6 +162,7 @@ public class Lexer
     // TODO: javadoc
     public void reset()
     {
+        this.error = false;
         this.input = new LexicalCharSequence(source);
         this.position = 0;
         this.sequence = 0;
@@ -168,6 +191,9 @@ public class Lexer
         }
         return tokens;
     }
+
+    // TODO: javadoc
+    private boolean error;
     
     // TODO: javadoc
     private final ExecutorService executorService;
@@ -227,7 +253,7 @@ class ScanResult implements Callable<ScanResult>
     public boolean isSuccess() {
         return success;
     }
-    
+
     // TODO: javadoc
     private final CharSequence input;
 

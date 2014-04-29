@@ -19,6 +19,7 @@
 package com.pmeade.lexer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -97,6 +98,25 @@ public class LexerTest
             .create());
     }
     
+    private static List<TokenType> prioTokens;
+    private static void setUpPrioTokens() {
+        prioTokens = new ArrayList();
+        prioTokens.add(new TokenTypeBuilder()
+            .name("LETTER_AND_NUMBER")
+            .pattern("[a-z1-9][a-z0-9]{0,10}")
+            .ignoreCase()
+            .create());
+        prioTokens.add(new TokenTypeBuilder()
+            .name("INT_LITERAL")
+            .pattern("[1-9][0-9]*")
+            .create());
+        prioTokens.add(new TokenTypeBuilder()
+            .name("WHITESPACE")
+            .pattern("\\s+")
+            .skip()
+            .create());
+    }
+    
     public LexerTest() {
     }
     
@@ -104,6 +124,7 @@ public class LexerTest
     public static void setUpClass() {
         setUpCalcTokens();
         setUpCILangTokens();
+        setUpPrioTokens();
         setUpWordTokens();
     }
     
@@ -357,5 +378,154 @@ public class LexerTest
             assertTrue("gosub".equals(token.getTokenText()));
             assertTrue(FLYWEIGHT_GOSUB == token.getTokenText());
         }
+    }
+    
+    @Test
+    public void testLexerMissingToken() {
+        Lexer lexer = new Lexer(calcTokens, "(3*5)");
+        
+        Token token1 = lexer.next();
+        assertNotNull(token1);
+        TokenType tokenType1 = token1.getTokenType();
+        assertNotNull(tokenType1);
+        assertEquals("LPAREN", tokenType1.getName());
+        
+        Token token2 = lexer.next();
+        assertNotNull(token2);
+        TokenType tokenType2 = token2.getTokenType();
+        assertNotNull(tokenType2);
+        assertEquals("INT_LITERAL", tokenType2.getName());
+        
+        Token token3 = lexer.next();
+        assertNull(token3);
+        assertTrue(lexer.isError());
+        for(int i=0; i<100; i++) {
+            assertNull(lexer.next());
+            assertTrue(lexer.isError());
+        }
+    }
+    
+    @Test
+    public void testResetAfterError() {
+        Lexer lexer = new Lexer(calcTokens, "(3*5)");
+        
+        Token token1 = lexer.next();
+        assertNotNull(token1);
+        TokenType tokenType1 = token1.getTokenType();
+        assertNotNull(tokenType1);
+        assertEquals("LPAREN", tokenType1.getName());
+        
+        Token token2 = lexer.next();
+        assertNotNull(token2);
+        TokenType tokenType2 = token2.getTokenType();
+        assertNotNull(tokenType2);
+        assertEquals("INT_LITERAL", tokenType2.getName());
+        
+        Token token3 = lexer.next();
+        assertNull(token3);
+        assertTrue(lexer.isError());
+        for(int i=0; i<100; i++) {
+            assertNull(lexer.next());
+            assertTrue(lexer.isError());
+        }
+        
+        lexer.reset();
+        
+        token1 = lexer.next();
+        assertNotNull(token1);
+        assertFalse(lexer.isError());
+        token2 = lexer.next();
+        assertNotNull(token2);
+        assertFalse(lexer.isError());
+        token3 = lexer.next();
+        assertNull(token3);
+        assertTrue(lexer.isError());
+    }
+    
+    @Test
+    public void testLexerEmptyTokens() {
+        Lexer lexer = new Lexer(new ArrayList(), "(3*5)");
+        assertFalse(lexer.isError());
+        List<Token> scan = lexer.scan();
+        assertTrue(lexer.isError());
+        assertTrue(scan.isEmpty());
+    }
+    
+    @Test
+    public void testLexerNullTokens() {
+        try {
+            Lexer lexer = new Lexer(null, "(3*5)");
+            fail();
+        } catch(NullPointerException e) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testLexerEmptyInput() {
+        Lexer lexer = new Lexer(calcTokens, "");
+        assertFalse(lexer.isError());
+        List<Token> scan = lexer.scan();
+        assertFalse(lexer.isError());
+        assertTrue(scan.isEmpty());
+    }
+    
+    @Test
+    public void testLexerNullInput() {
+        try {
+            Lexer lexer = new Lexer(calcTokens, null);
+            fail();
+        } catch(NullPointerException e) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testTokenPriority() {
+        Lexer lexer = new Lexer(prioTokens, "123456");
+        
+        Token token1 = lexer.next();
+        assertNotNull(token1);
+        TokenType tokenType1 = token1.getTokenType();
+        assertNotNull(tokenType1);
+        assertEquals("LETTER_AND_NUMBER", tokenType1.getName());
+        
+        Token token2 = lexer.next();
+        assertNull(token2);
+        assertFalse(lexer.isError());
+    }
+    
+    @Test
+    public void testTokenPriority2() {
+        List<TokenType> reversePrioTokens = new ArrayList();
+        reversePrioTokens.addAll(prioTokens);
+        Collections.reverse(reversePrioTokens);
+        
+        Lexer lexer = new Lexer(reversePrioTokens, "123456");
+        
+        Token token1 = lexer.next();
+        assertNotNull(token1);
+        TokenType tokenType1 = token1.getTokenType();
+        assertNotNull(tokenType1);
+        assertEquals("INT_LITERAL", tokenType1.getName());
+        
+        Token token2 = lexer.next();
+        assertNull(token2);
+        assertFalse(lexer.isError());
+    }
+    
+    @Test
+    public void testTokenBiggerIsBetter() {
+        Lexer lexer = new Lexer(prioTokens, "12345678901234567890");
+        
+        Token token1 = lexer.next();
+        assertNotNull(token1);
+        TokenType tokenType1 = token1.getTokenType();
+        assertNotNull(tokenType1);
+        assertEquals("INT_LITERAL", tokenType1.getName());
+        
+        Token token2 = lexer.next();
+        assertNull(token2);
+        assertFalse(lexer.isError());
     }
 }
