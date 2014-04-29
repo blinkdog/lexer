@@ -153,6 +153,16 @@ public class Token
     }
 
     /**
+     * Obtain a String representation of this Token. This may be useful
+     * for debugging purposes.
+     * @return a String representation of this Token
+     */
+    @Override
+    public String toString() {
+        return "[#" + sequence + " @" + position + " " + tokenType.getName() + " \"" + ((tokenType.getStaticText() == null) ? tokenText : tokenType.getStaticText()) + "\"]";
+    }
+    
+    /**
      * The position within the original input where this token began.
      * This value is provided to cross-reference back to the original input
      * if desired.
