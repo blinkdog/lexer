@@ -48,33 +48,65 @@ package com.pmeade.lexer;
  */
 public class LexicalCharSequence implements CharSequence
 {
-    // TODO: javadoc
+    /**
+     * Decorate a CharSequence for <code>subSequence()</code> performance
+     * benefits.
+     * @param source CharSequence to be decorated for performance reasons
+     */
     public LexicalCharSequence(CharSequence source) {
         this.count = source.length();
         this.offset = 0;
         this.source = source;
     }
-    
-    // TODO: javadoc
+
+    /**
+     * Construct a LexicalCharSequence that points to a specific offset
+     * within the provided CharSequence. This is a private constructor
+     * used to provide a return value for calls to <code>subSequence()</code>.
+     * This is the business end of the performance gain.
+     * @param source CharSequence to be decorated for performance reasons
+     * @param offset offset into the source input where the sequence starts
+     * @param count size of the sequence considered valid
+     */
     private LexicalCharSequence(CharSequence source, int offset, int count) {
         this.count = count;
         this.offset = offset;
         this.source = source;
     }
-    
-    // TODO: javadoc
+
+    /**
+     * Obtain the length of this LexicalCharSequence.
+     * @return the length of this LexicalCharSequence
+     */
     @Override
     public int length() {
         return count;
     }
 
-    // TODO: javadoc
+    /**
+     * Obtain the character at the specified position.
+     * @param index index of the character to be returned
+     * @return char value at the specified position
+     */
     @Override
     public char charAt(int index) {
         return source.charAt(index+offset);
     }
 
-    // TODO: javadoc
+    /**
+     * Obtain a CharSequence that corresponds to a sub-sequence of
+     * this LexicalCharSequence. Unlike the standard CharSequence,
+     * we do not copy the buffer, but instead calculate new pointers
+     * into the original input. This is the smart end of the performance
+     * gain.
+     * @param start starting index of the sub-sequence, inclusive
+     * @param end ending index of the sub-sequence, exclusive
+     * @return a CharSequence representing the requested sub-sequence of
+     *         this CharSequence
+     * @throws IndexOutOfBoundsException if start or end are less than 0,
+     *         if end is less than start, or end is greater than the
+     *         length of this CharSequence
+     */
     @Override
     public CharSequence subSequence(int start, int end) {
         if(start < 0) throw new IndexOutOfBoundsException();
@@ -84,18 +116,30 @@ public class LexicalCharSequence implements CharSequence
         return new LexicalCharSequence(source, offset+start, end-start);
     }
 
-    // TODO: javadoc
+    /**
+     * Obtain this CharSequence in String form.
+     * @return String object, containing the character data represented by
+     *         this CharSequence
+     */
     @Override
     public String toString() {
         return source.toString().substring(offset, offset+count);
     }
 
-    // TODO: javadoc
+    /**
+     * Length of this sub-sequence of the original provided input.
+     */
     private final int count;
 
-    // TODO: javadoc
+    /**
+     * Offset into the original provided input where this sub-sequence
+     * begins.
+     */
     private final int offset;
 
-    // TODO: javadoc
+    /**
+     * Original provided input. This is the CharSequence provided for
+     * performance decoration at construction time. 
+     */
     private final CharSequence source;
 }

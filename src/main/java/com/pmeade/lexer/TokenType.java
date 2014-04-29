@@ -20,10 +20,35 @@ package com.pmeade.lexer;
 
 import java.util.regex.Pattern;
 
-// TODO: javadoc
+/**
+ * TokenType represents a class of lexical unit. For example a sequence of
+ * digits might represent a literal integer. The objects of this class
+ * represent that lexical classification, containing a pattern to identify
+ * matching tokens, as well as information about what to do with tokens
+ * that do match.
+ */
 public class TokenType
 {
-    // TODO: javadoc
+    /**
+     * Construct a TokenType. This is the full constructor for a class of
+     * lexical token.
+     * @param name the name of this lexical class (i.e. "LPAREN", "RPAREN", etc)
+     * @param patternRegEx the regular expression of the Pattern to recognize
+     *                     this type of lexical token
+     * @param patternFlags the flags of the Pattern to recognize this type of
+     *                     lexical token
+     * @param skipped flag, indicating if these tokens should be skipped
+     *                (suppressed) during lexical output, typically true for
+     *                WHITESPACE or COMMENT lexical classes
+     * @param staticText flyweight text, to be used instead of the actual input
+     *                   text. this is used for literal keywords like "class"
+     *                   or "abstract", or literal symbols like "%" or "{",
+     *                   or other very narrow lexical classes. if not provided,
+     *                   tokens generated from this type will use the actual
+     *                   text matched from the input
+     * @see java.util.regex.Pattern
+     * @see TokenTypeBuilder
+     */
     public TokenType(
             String name,
             String patternRegEx,
@@ -37,35 +62,58 @@ public class TokenType
         this.staticText = staticText;
     }
 
-    // TODO: javadoc
+    /**
+     * Obtain the name of this TokenType.
+     * @return the name of this TokenType
+     */
     public String getName() {
         return name;
     }
-    
-    // TODO: javadoc
+
+    /**
+     * Obtain the Pattern of this TokenType.
+     * @return the Pattern of this TokenType
+     */
     public Pattern getPattern() {
         return pattern;
     }
 
-    // TODO: javadoc
+    /**
+     * Determine if a Token generated from this TokenType should be skipped
+     * (suppressed) during the Lexer's output.
+     * @return true, if a Token generated from this TokenType should be
+     *         skipped by the Lexer's output, otherwise false.
+     */
     public boolean isSkipped() {
         return skipped;
     }
 
-    // TODO: javadoc
+    /**
+     * Obtain the static text for this TokenType.
+     * @return the static text of this TokenType
+     */
     public String getStaticText() {
         return staticText;
     }
-    
-    // TODO: javadoc
+
+    /**
+     * The name of this TokenType.
+     */
     private final String name;
-    
-    // TODO: javadoc
+
+    /**
+     * The Pattern of this TokenType.
+     */
     private final Pattern pattern;
-    
-    // TODO: javadoc
+
+    /**
+     * Flag: Should a Token generated from this TokenType by skipped
+     *       (suppressed) by the output of the Lexer?
+     */
     private final boolean skipped;
 
-    // TODO: javadoc
+    /**
+     * The static (flyweight) text of this TokenType.
+     */
     private final String staticText;
 }

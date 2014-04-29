@@ -1,5 +1,4 @@
 # TO DO
-* Finish all JavaDoc and inline comments
 * Write complete documentation in README.md
 * Add examples package com.pmeade.lexer.example
 * Add example token sets
